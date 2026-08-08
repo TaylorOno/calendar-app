@@ -2,7 +2,7 @@ const events = [
     {
         title: "Lady Jane Anniversary Party",
         start: "2026-08-11T18:00:00",
-        end: "2026-08-11T11:59:00",
+        end: "2026-08-11T23:59:00",
         description: "Come Celebrate 8 Years with an arcade party",
         location: "Lady Jane"
     },
