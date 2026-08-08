@@ -1,0 +1,129 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="">
+
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <meta property="og:image:alt" content="">
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#fafafa">
+
+    <!-- STANDARD JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/all/global.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/events.js"></script>
+
+    <!-- THEME JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/global.js"></script>
+
+    <!-- STYLESHEETS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/skeleton.css' rel='stylesheet'/>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/theme.css' rel='stylesheet'/>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/palettes/purple.css' rel='stylesheet'/>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var calendarEl = document.getElementById("calendar");
+            var popover = document.getElementById("event-popover");
+            var selectedEvent = null;
+
+            function showEventDetails(event, clickEvent) {
+                clickEvent.preventDefault();
+                clickEvent.stopPropagation();
+                selectedEvent = event;
+
+                document.getElementById("event-popover-title").textContent = event.title;
+                document.getElementById("event-popover-date").textContent = event.allDay
+                    ? event.start.toLocaleDateString(undefined, {dateStyle: "full"})
+                    : event.start.toLocaleString(undefined, {dateStyle: "full", timeStyle: "short"}) +
+                    " - " + event.end.toLocaleTimeString(undefined, {timeStyle: "short"});
+                document.getElementById("event-popover-description").textContent =
+                    event.extendedProps.description || "No additional details.";
+                document.getElementById("event-popover-location").textContent = event.extendedProps.location
+                    ? "Location: " + event.extendedProps.location
+                    : "";
+
+                popover.classList.add("is-open");
+                popover.setAttribute("aria-hidden", "false");
+                document.getElementById("event-popover-close").focus();
+            }
+
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            headerToolbar: {
+              left: "prev,next today",
+              center: "title",
+                    right: "dayGridDay,timeGridWeek,dayGridMonth"
+                },
+                buttonText: {
+                    today: "Today",
+                    day: "Day",
+                    week: "Week",
+                    month: "Month"
+                },
+                events: events,
+                eventDidMount: function (info) {
+                    info.el.addEventListener("click", function (clickEvent) {
+                        showEventDetails(info.event, clickEvent);
+                    });
+                }
+            });
+            calendar.render();
+
+            var closePopover = function () {
+                popover.classList.remove("is-open");
+                popover.setAttribute("aria-hidden", "true");
+            };
+            document.getElementById("event-popover-add").addEventListener("click", function () {
+                addEventToCalendar(selectedEvent)
+            });
+            document.getElementById("event-popover-close").addEventListener("click", closePopover);
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") closePopover();
+            });
+            document.addEventListener("click", function (event) {
+                if (popover.classList.contains("is-open") && !popover.contains(event.target) && !event.target.closest(".fc-event")) {
+                    closePopover();
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+<nav>
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Submit Event</a></li>
+        <li><a href="#">Calendar</a></li>
+    </ul>
+</nav>
+<main>
+    <div id="calendar"></div>
+    <aside id="event-popover" class="event-popover" role="dialog" aria-labelledby="event-popover-title"
+           aria-hidden="true">
+        <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">
+            &times;
+        </button>
+        <h2 id="event-popover-title"></h2>
+        <p id="event-popover-date"></p>
+        <p id="event-popover-description"></p>
+        <p id="event-popover-location"></p>
+        <button id="event-popover-add" class="event-popover-add" type="button">Add to calendar</button>
+    </aside>
+</main>
+</body>
+
+</html>
