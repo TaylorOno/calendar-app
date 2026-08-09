@@ -11,6 +11,15 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
+:root {
+  --party: #ffc107;
+  --education: #007bff;
+  --competition: #fd9019;
+  --fund-raiser: #28a745;
+  --sponsored: #17a2b8;
+  --industry: #dc3545;
+}
+
 html {
   color: #222;
   font-size: 1em;
@@ -91,6 +100,19 @@ textarea {
 #calendar {
   max-width: 1100px;
   margin: 2rem auto;
+}
+
+.category {
+  pointer-events: none;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 13px;
+  margin-left: -1px;
+  margin-bottom: 10px;
+  border-radius: 100px;
 }
 
 .event-popover {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>Denver Industry Event Calendar</title>
     <link rel="stylesheet" href="css/style.css">
     <meta name="description" content="">
 
@@ -14,7 +14,7 @@
     <meta property="og:image" content="">
     <meta property="og:image:alt" content="">
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/site/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon.png">
 
@@ -22,7 +22,7 @@
     <meta name="theme-color" content="#fafafa">
 
     <!-- STANDARD JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/all/global.js"></script>
+    <script src="js/fullcalendar.global.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/events.js"></script>
 
@@ -47,24 +47,24 @@
                 document.getElementById("event-popover-date").textContent = event.allDay
                     ? event.start.toLocaleDateString(undefined, {dateStyle: "full"})
                     : event.start.toLocaleString(undefined, {dateStyle: "full", timeStyle: "short"}) +
-                    " - " + event.end.toLocaleTimeString(undefined, {timeStyle: "short"});
-                document.getElementById("event-popover-description").textContent =
-                    event.extendedProps.description || "No additional details.";
-                document.getElementById("event-popover-location").textContent = event.extendedProps.location
-                    ? "Location: " + event.extendedProps.location
-                    : "";
+                    (event.end ? " - " + event.end.toLocaleTimeString(undefined, {timeStyle: "short"}) : "");
+                document.getElementById("event-popover-description").innerHTML = event.extendedProps.description || "";
+                document.getElementById("event-popover-location").textContent = event.extendedProps.location ? "Location: " + event.extendedProps.location : "";
+                let category = document.getElementById("event-popover-category");
+                category.textContent = event.extendedProps.category ? event.extendedProps.category : "";
+                category.style.backgroundColor = event.color ? event.color : "#EFF4FF";
 
                 popover.classList.add("is-open");
                 popover.setAttribute("aria-hidden", "false");
                 document.getElementById("event-popover-close").focus();
             }
 
-          var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: "dayGridMonth",
-            headerToolbar: {
-              left: "prev,next today",
-              center: "title",
-                    right: "dayGridDay,timeGridWeek,dayGridMonth"
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: "dayGridMonth",
+                navLinks: true,
+                headerToolbar: {
+                    left: "prev,next today",
+                    right: "timeGridDay,timeGridWeek,dayGridMonth"
                 },
                 buttonText: {
                     today: "Today",
@@ -73,12 +73,17 @@
                     month: "Month"
                 },
                 events: events,
-                eventDidMount: function (info) {
-                    info.el.addEventListener("click", function (clickEvent) {
-                        showEventDetails(info.event, clickEvent);
-                    });
+                eventClick: function (info) {
+                    showEventDetails(info.event, info.jsEvent);
                 }
             });
+
+            // For mobile compatibility: ensuring elements have a cursor pointer or are clickable
+            calendarEl.style.cursor = "pointer";
+            
+            // Fix for some mobile browsers (iOS) to recognize non-interactive elements as clickable
+            document.addEventListener("touchstart", function() {}, {passive: true});
+            
             calendar.render();
 
             var closePopover = function () {
@@ -105,7 +110,7 @@
 <nav>
     <ul>
         <li><a href="#">Home</a></li>
-        <li><a href="#">Submit Event</a></li>
+        <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdEUzqHDnSDVY6t4dpUjvbSuOCwDcIkHhLcKNfqhr9DfBLvcA/viewform">Submit Event</a></li>
         <li><a href="#">Calendar</a></li>
     </ul>
 </nav>
@@ -117,6 +122,7 @@
             &times;
         </button>
         <h2 id="event-popover-title"></h2>
+        <div class="category" id="event-popover-category"></div>
         <p id="event-popover-date"></p>
         <p id="event-popover-description"></p>
         <p id="event-popover-location"></p>
