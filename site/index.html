@@ -29,10 +29,34 @@
     <!-- THEME JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/global.js"></script>
 
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@500;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
     <!-- STYLESHEETS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/skeleton.css' rel='stylesheet'/>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/theme.css' rel='stylesheet'/>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/palettes/purple.css' rel='stylesheet'/>
+    <style>
+        :root {
+            --fc-button-bg-color: #002868;
+            --fc-button-border-color: #002868;
+            --fc-button-hover-bg-color: #BF0A30;
+            --fc-button-hover-border-color: #BF0A30;
+            --fc-button-active-bg-color: #BF0A30;
+            --fc-button-active-border-color: #BF0A30;
+            --fc-event-bg-color: #002868;
+            --fc-event-border-color: #002868;
+            --fc-today-bg-color: rgba(255, 215, 0, 0.1);
+        }
+
+        .fc-toolbar-title {
+            color: #002868;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var calendarEl = document.getElementById("calendar");
@@ -41,7 +65,6 @@
             function showEventDetails(event, clickEvent) {
                 clickEvent.preventDefault();
                 clickEvent.stopPropagation();
-                selectedEvent = event;
 
                 document.getElementById("event-popover-title").textContent = event.title;
                 document.getElementById("event-popover-date").textContent = event.allDay
@@ -52,7 +75,11 @@
                 document.getElementById("event-popover-location").textContent = event.extendedProps.location ? "Location: " + event.extendedProps.location : "";
                 let category = document.getElementById("event-popover-category");
                 category.textContent = event.extendedProps.category ? event.extendedProps.category : "";
-                category.style.backgroundColor = event.color ? event.color : "#EFF4FF";
+
+                // Use the event's color or fallback to blue
+                let eventColor = event.backgroundColor || event.color || "#002868";
+                category.style.backgroundColor = eventColor;
+                category.style.color = "#FFF";
 
                 popover.classList.add("is-open");
                 popover.setAttribute("aria-hidden", "false");
@@ -60,17 +87,27 @@
             }
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: "dayGridMonth",
-                navLinks: true,
+                initialView: (window.innerWidth < 768) ? "listWeek" : "dayGridMonth",
+                navLinks: true, // can click day/week names to navigate views
+                dayMaxEvents: true, // allow "more" link when too many events
                 headerToolbar: {
                     left: "prev,next today",
-                    right: "timeGridDay,timeGridWeek,dayGridMonth"
+                    center: "title",
+                    right: (window.innerWidth < 768) ? "listWeek,dayGridMonth" : "timeGridDay,dayGridWeek,dayGridMonth"
                 },
                 buttonText: {
                     today: "Today",
                     day: "Day",
                     week: "Week",
                     month: "Month"
+                },
+                views: {
+                    timeGrid: {
+                        scrollTime: "09:00:00"
+                    },
+                    listWeek: {
+                        buttonText: "List"
+                    }
                 },
                 events: events,
                 eventClick: function (info) {
@@ -80,10 +117,23 @@
 
             // For mobile compatibility: ensuring elements have a cursor pointer or are clickable
             calendarEl.style.cursor = "pointer";
-            
+
             // Fix for some mobile browsers (iOS) to recognize non-interactive elements as clickable
-            document.addEventListener("touchstart", function() {}, {passive: true});
-            
+            document.addEventListener("touchstart", function () {
+            }, {passive: true});
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth < 768) {
+                    if (calendar.view.type !== "listWeek" && calendar.view.type !== "dayGridMonth") {
+                        calendar.changeView("listWeek");
+                    }
+                } else {
+                    if (calendar.view.type === "listWeek") {
+                        calendar.changeView("dayGridMonth");
+                    }
+                }
+            });
+
             calendar.render();
 
             var closePopover = function () {
@@ -91,7 +141,7 @@
                 popover.setAttribute("aria-hidden", "true");
             };
             document.getElementById("event-popover-add").addEventListener("click", function () {
-                addEventToCalendar(selectedEvent)
+                // To be implemented: add to personal calendar logic
             });
             document.getElementById("event-popover-close").addEventListener("click", closePopover);
             document.addEventListener("keydown", function (event) {
@@ -107,20 +157,33 @@
 </head>
 
 <body>
+<header class="co-header">
+    <div class="header-content">
+        <h1>Denver Industry Events</h1>
+    </div>
+</header>
 <nav>
-    <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdEUzqHDnSDVY6t4dpUjvbSuOCwDcIkHhLcKNfqhr9DfBLvcA/viewform">Submit Event</a></li>
-        <li><a href="#">Calendar</a></li>
-    </ul>
+    <div class="nav-container">
+        <ul>
+            <li><a href="#home-section">Home</a></li>
+            <li>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdEUzqHDnSDVY6t4dpUjvbSuOCwDcIkHhLcKNfqhr9DfBLvcA/viewform">Submit Event</a>
+            </li>
+            <li><a href="#calendar-section">Calendar</a></li>
+            <li><a href="#upcoming-events-section">Upcoming events</a></li>
+        </ul>
+    </div>
 </nav>
-<main>
-    <div id="calendar"></div>
-    <aside id="event-popover" class="event-popover" role="dialog" aria-labelledby="event-popover-title"
-           aria-hidden="true">
-        <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">
-            &times;
-        </button>
+<main id="main-content">
+    <section id="home-section">
+        <div class="home-quote-container">
+            <p class="home-quote-text">It's like a jungle sometimes<br> it makes me wonder how I keep from going under</p>
+        </div>
+    </section>
+    <section id="upcoming-events-section">This is the upcoming events section</section>
+    <section id="calendar-section"><div id="calendar"></div></section>
+    <aside id="event-popover" class="event-popover" role="dialog" aria-labelledby="event-popover-title" aria-hidden="true">
+        <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">&times;</button>
         <h2 id="event-popover-title"></h2>
         <div class="category" id="event-popover-category"></div>
         <p id="event-popover-date"></p>
@@ -129,6 +192,10 @@
         <button id="event-popover-add" class="event-popover-add" type="button">Add to calendar</button>
     </aside>
 </main>
-</body>
 
+<footer class="footer">
+    <div class="footer-content">
+    </div>
+</footer>
+</body>
 </html>
