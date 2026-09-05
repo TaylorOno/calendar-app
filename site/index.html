@@ -25,6 +25,7 @@
     <script src="js/fullcalendar.global.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/events.js"></script>
+    <script src="js/upcoming-events.js"></script>
 
     <!-- THEME JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/global.js"></script>
@@ -187,7 +188,14 @@
                 src="https://docs.google.com/forms/d/e/1FAIpQLSdEUzqHDnSDVY6t4dpUjvbSuOCwDcIkHhLcKNfqhr9DfBLvcA/viewform?embedded=true"
                 title="Submit Event Form">Loading…</iframe>
     </section>
-    <section id="upcoming-events-section">This is the upcoming events section</section>
+    <section id="upcoming-events-section">
+        <div class="upcoming-events-container">
+            <h2>Upcoming Events</h2>
+            <div id="upcoming-events-list" class="upcoming-events-list">
+                <p class="loading-events">Loading upcoming events…</p>
+            </div>
+        </div>
+    </section>
     <section id="calendar-section"><div id="calendar"></div></section>
     <aside id="event-popover" class="event-popover" role="dialog" aria-labelledby="event-popover-title" aria-hidden="true">
         <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">&times;</button>
