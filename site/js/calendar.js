@@ -10,48 +10,48 @@ function escapeCalendarText(value) {
     .replace(/\r?\n/g, "\\n");
 }
 
-function addEventToCalendar(selectedEvent) {
-  if (!selectedEvent) return;
+function addEventToCalendar(event) {
+  if (!event) return;
 
-  var isAndroid = /Android/i.test(navigator.userAgent);
-  var start = selectedEvent.start;
-  var end = selectedEvent.end || new Date(start.getTime() + 60 * 60 * 1000);
+  let isAndroid = /Android/i.test(navigator.userAgent);
+  let start = event.start;
+  let end = event.end || new Date(start.getTime() + 60 * 60 * 1000);
 
   if (isAndroid) {
-    var googleCalendarUrl = new URL("https://calendar.google.com/calendar/render");
+    let googleCalendarUrl = new URL("https://calendar.google.com/calendar/render");
     googleCalendarUrl.searchParams.set("action", "TEMPLATE");
-    googleCalendarUrl.searchParams.set("text", selectedEvent.title);
+    googleCalendarUrl.searchParams.set("text", event.title);
     googleCalendarUrl.searchParams.set("dates", formatCalendarDate(start) + "/" + formatCalendarDate(end));
-    googleCalendarUrl.searchParams.set("details", selectedEvent.extendedProps.description || "");
-    googleCalendarUrl.searchParams.set("location", selectedEvent.extendedProps.location || "");
+    googleCalendarUrl.searchParams.set("details", event.extendedProps.description || "");
+    googleCalendarUrl.searchParams.set("location", event.extendedProps.location || "");
     window.open(googleCalendarUrl.toString(), "_blank");
     return;
   }
 
-  var icsStart = selectedEvent.allDay
-    ? start.toISOString().slice(0, 10).replace(/-/g, "")
-    : formatCalendarDate(start);
-  var icsEnd = selectedEvent.allDay
-    ? new Date(end.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10).replace(/-/g, "")
-    : formatCalendarDate(end);
-  var ics = [
+  let icsStart = event.allDay
+      ? start.toISOString().slice(0, 10).replace(/-/g, "")
+      : formatCalendarDate(start);
+  let icsEnd = event.allDay
+      ? new Date(end.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10).replace(/-/g, "")
+      : formatCalendarDate(end);
+  let ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Calendar Widget//EN",
     "BEGIN:VEVENT",
     "UID:" + Date.now() + "@calendar-widget",
-    (selectedEvent.allDay ? "DTSTART;VALUE=DATE:" : "DTSTART:") + icsStart,
-    (selectedEvent.allDay ? "DTEND;VALUE=DATE:" : "DTEND:") + icsEnd,
-    "SUMMARY:" + escapeCalendarText(selectedEvent.title),
-    "DESCRIPTION:" + escapeCalendarText(selectedEvent.extendedProps.description),
-    "LOCATION:" + escapeCalendarText(selectedEvent.extendedProps.location),
+    (event.allDay ? "DTSTART;VALUE=DATE:" : "DTSTART:") + icsStart,
+    (event.allDay ? "DTEND;VALUE=DATE:" : "DTEND:") + icsEnd,
+    "SUMMARY:" + escapeCalendarText(event.title),
+    "DESCRIPTION:" + escapeCalendarText(event.extendedProps.description),
+    "LOCATION:" + escapeCalendarText(event.extendedProps.location),
     "END:VEVENT",
     "END:VCALENDAR"
   ].join("\r\n");
-  var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-  var downloadLink = document.createElement("a");
+  let blob = new Blob([ics], {type: "text/calendar;charset=utf-8"});
+  let downloadLink = document.createElement("a");
   downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = selectedEvent.title.replace(/[^a-z0-9]/gi, "-").toLowerCase() + ".ics";
+  downloadLink.download = event.title.replace(/[^a-z0-9]/gi, "-").toLowerCase() + ".ics";
   document.body.appendChild(downloadLink);
   downloadLink.click();
   downloadLink.remove();

@@ -39,55 +39,36 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/skeleton.css' rel='stylesheet'/>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/theme.css' rel='stylesheet'/>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/themes/monarch/palettes/purple.css' rel='stylesheet'/>
-    <style>
-        :root {
-            --fc-button-bg-color: #002868;
-            --fc-button-border-color: #002868;
-            --fc-button-hover-bg-color: #BF0A30;
-            --fc-button-hover-border-color: #BF0A30;
-            --fc-button-active-bg-color: #BF0A30;
-            --fc-button-active-border-color: #BF0A30;
-            --fc-event-bg-color: #002868;
-            --fc-event-border-color: #002868;
-            --fc-today-bg-color: rgba(255, 215, 0, 0.1);
-        }
 
-        .fc-toolbar-title {
-            color: #002868;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-    </style>
     <script>
+        let selectedEvent = null;
+
         document.addEventListener("DOMContentLoaded", function () {
-            var calendarEl = document.getElementById("calendar");
-            var popover = document.getElementById("event-popover");
+            const calendarEl = document.getElementById("calendar");
+            const popover = document.getElementById("event-popover");
 
             function showEventDetails(event, clickEvent) {
                 clickEvent.preventDefault();
                 clickEvent.stopPropagation();
 
+                selectedEvent = event;
                 document.getElementById("event-popover-title").textContent = event.title;
                 document.getElementById("event-popover-date").textContent = event.allDay
                     ? event.start.toLocaleDateString(undefined, {dateStyle: "full"})
-                    : event.start.toLocaleString(undefined, {dateStyle: "full", timeStyle: "short"}) +
-                    (event.end ? " - " + event.end.toLocaleTimeString(undefined, {timeStyle: "short"}) : "");
+                    : event.start.toLocaleString(undefined, {dateStyle: "full", timeStyle: "short"}) + (event.end ? " - " + event.end.toLocaleTimeString(undefined, {timeStyle: "short"}) : "");
                 document.getElementById("event-popover-description").innerHTML = event.extendedProps.description || "";
                 document.getElementById("event-popover-location").textContent = event.extendedProps.location ? "Location: " + event.extendedProps.location : "";
                 let category = document.getElementById("event-popover-category");
                 category.textContent = event.extendedProps.category ? event.extendedProps.category : "";
 
                 // Use the event's color or fallback to blue
-                let eventColor = event.backgroundColor || event.color || "#002868";
-                category.style.backgroundColor = eventColor;
+                category.style.backgroundColor = event.backgroundColor || event.color || "#002868";
                 category.style.color = "#FFF";
 
-                popover.classList.add("is-open");
-                popover.setAttribute("aria-hidden", "false");
-                document.getElementById("event-popover-close").focus();
+                popover.showModal();
             }
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: (window.innerWidth < 768) ? "listWeek" : "dayGridMonth",
                 navLinks: true, // can click day/week names to navigate views
                 dayMaxEvents: true, // allow "more" link when too many events
@@ -137,20 +118,17 @@
 
             calendar.render();
 
-            var closePopover = function () {
-                popover.classList.remove("is-open");
-                popover.setAttribute("aria-hidden", "true");
-            };
+            document.getElementById("event-popover-close").addEventListener("click", function () {
+                popover.close();
+            });
+
             document.getElementById("event-popover-add").addEventListener("click", function () {
-                // To be implemented: add to personal calendar logic
+                addEventToCalendar(selectedEvent)
             });
-            document.getElementById("event-popover-close").addEventListener("click", closePopover);
-            document.addEventListener("keydown", function (event) {
-                if (event.key === "Escape") closePopover();
-            });
-            document.addEventListener("click", function (event) {
-                if (popover.classList.contains("is-open") && !popover.contains(event.target) && !event.target.closest(".fc-event")) {
-                    closePopover();
+
+            popover.addEventListener("click", function (event) {
+                if (event.target === popover) {
+                    popover.close();
                 }
             });
         });
@@ -180,13 +158,15 @@
 <main id="main-content">
     <section id="home-section">
         <div class="home-quote-container">
-            <p class="home-quote-text">It's like a jungle sometimes<br> it makes me wonder how I keep from going under</p>
+            <p class="home-quote-text">It's like a jungle sometimes<br> it makes me wonder how I keep from going under
+            </p>
         </div>
     </section>
     <section id="submit-event-section">
         <iframe class="submit-event-iframe"
                 src="https://docs.google.com/forms/d/e/1FAIpQLSdEUzqHDnSDVY6t4dpUjvbSuOCwDcIkHhLcKNfqhr9DfBLvcA/viewform?embedded=true"
-                title="Submit Event Form">Loading…</iframe>
+                title="Submit Event Form">Loading…
+        </iframe>
     </section>
     <section id="upcoming-events-section">
         <div class="upcoming-events-container">
@@ -196,17 +176,20 @@
             </div>
         </div>
     </section>
-    <section id="calendar-section"><div id="calendar"></div></section>
-    <aside id="event-popover" class="event-popover" role="dialog" aria-labelledby="event-popover-title" aria-hidden="true">
-        <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">&times;</button>
-        <h2 id="event-popover-title"></h2>
-        <div class="category" id="event-popover-category"></div>
-        <p id="event-popover-date"></p>
-        <p id="event-popover-description"></p>
-        <p id="event-popover-location"></p>
-        <button id="event-popover-add" class="event-popover-add" type="button">Add to calendar</button>
-    </aside>
+    <section id="calendar-section">
+        <div id="calendar"></div>
+    </section>
 </main>
+
+<dialog id="event-popover" class="event-popover" aria-labelledby="event-popover-title">
+    <button id="event-popover-close" class="event-popover-close" type="button" aria-label="Close event details">&times;</button>
+    <h2 id="event-popover-title"></h2>
+    <div class="category" id="event-popover-category"></div>
+    <p id="event-popover-date"></p>
+    <p id="event-popover-description"></p>
+    <p id="event-popover-location"></p>
+    <button id="event-popover-add" class="event-popover-add" type="button">Add to calendar</button>
+</dialog>
 
 <footer class="footer">
     <div class="footer-content">
