@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@500;700&family=Great+Vibes&display=swap');
-
 *,
 *::before,
 *::after {
@@ -21,24 +19,35 @@
   --industry: #555;
 }
 
+html,
 body {
+  height: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+body {
   background-color: #f4f7f9;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+.site-header {
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
 .co-header {
-  background: linear-gradient(rgba(0, 40, 104, 0.8), rgba(0, 40, 104, 0.8));
+  background-color: rgba(0, 40, 104, 0.85);
   color: var(--co-white);
-  padding: 4rem 1rem;
+  padding: 1.25rem 1rem;
   text-align: center;
 }
 
 .co-header h1 {
-  font-size: clamp(1.5rem, 8vw, 3rem);
+  font-size: clamp(1.25rem, 4vw, 2.25rem);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -47,10 +56,6 @@ body {
 
 nav {
   background-color: var(--co-blue);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .nav-container {
@@ -64,32 +69,49 @@ nav ul {
   padding: 0;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+nav ul li {
+  flex-shrink: 0;
 }
 
 nav ul li a {
   display: block;
   color: var(--co-white);
-  padding: 1rem 1.5rem;
+  padding: 0.75rem clamp(0.75rem, 2vw, 1.5rem);
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
   text-decoration: none;
   font-weight: bold;
+  white-space: nowrap;
   transition: background-color 0.3s;
 }
 
+nav ul li a:hover,
+nav ul li a:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
 main {
-  padding: 0 1rem;
-  flex: 1 0 auto;
+  padding: 1rem;
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 section {
   max-width: 1100px;
-  margin: 1rem auto;
+  margin: 0 auto;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 main > section {
@@ -98,6 +120,8 @@ main > section {
 
 main > section:target {
   display: block;
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 main:not(:has(> section:target)) #home-section,
@@ -106,9 +130,10 @@ main > #home-section:target {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 50vh;
   text-align: center;
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 1.5rem;
 }
 
 .home-quote-container {
@@ -127,21 +152,6 @@ main > #home-section:target {
   text-shadow: 1px 1px 2px rgba(0, 40, 104, 0.15);
 }
 
-html:has(#submit-event-section:target),
-body:has(#submit-event-section:target),
-html:has(#upcoming-events-section:target),
-body:has(#upcoming-events-section:target) {
-  height: 100vh;
-  overflow: hidden;
-}
-
-body:has(#submit-event-section:target) main,
-body:has(#upcoming-events-section:target) main {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
 #submit-event-section {
   padding: 0;
   overflow: hidden;
@@ -150,20 +160,17 @@ body:has(#upcoming-events-section:target) main {
 main > #submit-event-section:target {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: auto;
 }
 
 .submit-event-iframe {
   width: 100%;
   height: 100%;
+  flex: 1 1 0;
   min-height: 0;
   border: 0;
   display: block;
   background-color: var(--co-white);
   border-radius: 8px;
-  flex: 1 1 0;
 }
 
 .event-popover {
@@ -232,16 +239,11 @@ main > #submit-event-section:target {
 }
 
 #upcoming-events-section {
-  padding: 2rem;
-  overflow: hidden;
+  padding: 2rem 1.5rem;
 }
 
-main > #upcoming-events-section:target {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: auto;
+#calendar-section {
+  padding: 1.5rem;
 }
 
 .upcoming-events-container {
@@ -372,38 +374,7 @@ main > #upcoming-events-section:target {
   background-color: var(--co-mountain);
   color: var(--co-white);
   text-align: center;
-  position: relative;
   width: 100%;
   min-height: 3rem;
   flex-shrink: 0;
-  word-wrap: break-word;
-}
-
-.footer-content {
-  position: relative;
-  z-index: 1;
-}
-
-@media only screen and (max-width: 600px) {
-  .co-header {
-    padding: 2rem 1rem;
-  }
-  .co-header h1 {
-    font-size: 1.8rem;
-  }
-  nav ul li a {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-  }
-  .fc-toolbar {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .event-popover {
-    width: calc(100% - 1rem);
-    padding: 1.5rem 1rem;
-  }
-  #upcoming-events-section {
-    padding: 1.5rem 1rem;
-  }
 }
