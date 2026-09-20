@@ -112,14 +112,15 @@ main > #home-section:target {
 }
 
 .home-quote-container {
-  max-width: 850px;
+  width: 100%;
   margin: auto;
-  padding: 3rem 1.5rem;
 }
 
 .home-quote-text {
+  width: 100%;
+  text-align: center;
   font-family: 'Great Vibes', 'Alex Brush', 'Dancing Script', 'Brush Script MT', 'Segoe Script', cursive;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(1.6rem, 5vw, 3.2rem);
   line-height: 1.5;
   color: var(--co-blue);
   margin: 0;
